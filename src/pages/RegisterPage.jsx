@@ -17,19 +17,15 @@ const Signup = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
   try {
-    const response = await axios.post('http://localhost:3000/auth/signup', formData);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const response = await axios.post(`${API_URL}/auth/signup`, formData);
     
-    // Basado en tu captura de Network:
-    // La respuesta contiene el objeto "user" y el "message"
     console.log("Respuesta exitosa:", response.data);
 
-    // Si tu microservicio no devuelve la sesión completa, 
-    // usaremos el ID del usuario recién creado para permitir el acceso a la ficha
     if (response.data.user || response.data.data?.user) {
       const user = response.data.user || response.data.data.user;
       
       localStorage.setItem('user_id', user.id);
-      // Guardamos un flag temporal si no hay token aún, para que MedicalRecords te deje pasar
       localStorage.setItem('temp_access', 'true'); 
 
       alert('¡Cuenta creada con éxito! Vamos a completar tu ficha médica.');

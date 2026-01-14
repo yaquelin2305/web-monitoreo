@@ -30,15 +30,17 @@ const MedicalRecords = () => {
     const userId = localStorage.getItem('user_id');
 
     try {
-      await axios.post('http://localhost:3000/medical/records', {
+      // Usamos la variable de entorno de Railway o localhost para desarrollo
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+      await axios.post(`${API_URL}/medical/records`, {
         ...medicalData,
         user_id: userId
       });
       alert('¡Ficha médica completada con éxito!');
       navigate('/Dashboard'); 
     } catch (error) {
-      // Error capturado en consola si la ruta falla
-      console.error("Error al guardar:", error.response?.data);
+      console.error("Error al guardar:", error.response?.data || error.message);
       alert('Error al guardar la información médica.');
     }
   };

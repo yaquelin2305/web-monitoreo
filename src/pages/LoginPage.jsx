@@ -8,15 +8,13 @@ const Login = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
-  };
-
-  const handleLogin = async (e) => {
+const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      // Conexión con tu microservicio
-      const response = await axios.post('http://localhost:3000/auth/login', credentials);
+      // Usamos la variable de entorno configurada en Railway
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      
+      const response = await axios.post(`${API_URL}/auth/login`, credentials);
       
       // Guardamos el token de sesión
       localStorage.setItem('token', response.data.session.access_token);
@@ -24,9 +22,10 @@ const Login = () => {
       alert('¡Bienvenido a Salud Al Día!');
       navigate('/health'); 
     } catch (error) {
+      console.error("Error en login:", error.response?.data || error.message);
       alert('Error: Verifique sus credenciales');
     }
-  };
+};
 
   return (
     <div className="login-container">
