@@ -11,7 +11,7 @@ const Login = () => {
 const handleChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };  
-  
+
 const handleLogin = async (e) => {
     e.preventDefault();
     try {
@@ -24,7 +24,7 @@ const handleLogin = async (e) => {
       localStorage.setItem('token', response.data.session.access_token);
       
       alert('¡Bienvenido a Salud Al Día!');
-      navigate('/health'); 
+      navigate('/Dashboard');
     } catch (error) {
       console.error("Error en login:", error.response?.data || error.message);
       alert('Error: Verifique sus credenciales');
