@@ -43,6 +43,7 @@ const Navbar = () => {
                             <>
                                 <Link to="/dashboard" className="nav-item" onClick={() => setIsOpen(false)}>Mi Panel</Link>
                                 <Link to="/historial" className="nav-item" onClick={() => setIsOpen(false)}>Historial</Link>
+                                <Link to="/perfil" className="nav-item" onClick={() => setIsOpen(false)}>Mi Perfil</Link>
                             </>
                         )}
                     </div>

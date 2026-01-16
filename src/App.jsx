@@ -11,6 +11,7 @@ import MedicalRecords from "./pages/MedicalRecords";
 import AdminPage from "./pages/AdminPage";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/Admin/ProtectedRoute";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
         {/* Rutas privadas */}
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/historial" element={<HistoryPage />} />
+        <Route path="/perfil" element={<ProfilePage />} />
         <Route path="/registro-salud" element={<HealthRegisterPage />} />
 
         {/* Admin */}
