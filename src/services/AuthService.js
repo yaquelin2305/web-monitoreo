@@ -15,7 +15,7 @@ export const isAdmin = async () => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}` 
       },
-      body: JSON.stringify({ email: userEmail })
+      body: JSON.stringify({ email: userEmail.toLowerCase() })
     });
 
     if (!response.ok) {
