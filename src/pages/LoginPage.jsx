@@ -19,21 +19,39 @@ const Login = () => {
     e.preventDefault();
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      
       const response = await axios.post(`${API_URL}/auth/login`, credentials);
+      const data = response.data;
+
+      const token = data.session?.access_token || data.token;
+      if (token) {
+        localStorage.setItem('token', token);
+      }
       
-      localStorage.setItem('token', response.data.session.access_token);
       localStorage.setItem('user_email', credentials.email); 
 
-      if (response.data.user && response.data.user.id) {
-          localStorage.setItem('user_id', response.data.user.id);
+      let userId = null;
+      let userData = null;
+
+      if (data.user && data.user.id) {
+          userId = data.user.id;
+          userData = data.user;
+      } else if (data.session && data.session.user && data.session.user.id) {
+          userId = data.session.user.id;
+          userData = data.session.user;
+      }
+
+      if (userId) {
+          localStorage.setItem('user_id', userId);
           
-          const meta = response.data.user.user_metadata || {};
-          const firstName = meta.first_names || "Usuario";
-          const lastName = meta.last_names || "";
-        
-          localStorage.setItem('user_name', `${firstName} ${lastName}`.trim());
-      } 
+          if (userData) {
+             const meta = userData.user_metadata || {};
+             const firstName = meta.first_names || "Usuario";
+             const lastName = meta.last_names || "";
+             localStorage.setItem('user_name', `${firstName} ${lastName}`.trim());
+          }
+
+          window.dispatchEvent(new Event("storage"));
+      }
 
       navigate('/Dashboard');
     } catch (error) {
@@ -77,7 +95,7 @@ const Login = () => {
         </form>
 
         <p className="auth-footer">
-          ¿Es nuevo aquí? <Link to="/signup">Crear una cuenta</Link>
+          ¿No tiene una cuenta? <Link to="/signup">Regístrese aquí</Link>
         </p>
       </div>
     </div>
