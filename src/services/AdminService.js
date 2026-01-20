@@ -1,23 +1,30 @@
 const API_ADMIN_URL = import.meta.env.VITE_API_ADMIN_URL || 'http://localhost:4000/api/admin';
 
+const getHeaders = () => ({
+  'Content-Type': 'application/json',
+  'Authorization': `Bearer ${localStorage.getItem('token')}`
+});
+
 export const getStats = async () => {
   try {
-    const response = await fetch(`${API_ADMIN_URL}/stats`);
+    const response = await fetch(`${API_ADMIN_URL}/stats`, {
+      headers: getHeaders()
+    });
     if (!response.ok) throw new Error('Error al obtener estadísticas');
     return await response.json();
   } catch (error) {
-    console.error("Error getStats:", error);
     return null;
   }
 };
 
 export const getUsers = async () => {
   try {
-    const response = await fetch(`${API_ADMIN_URL}/users`);
+    const response = await fetch(`${API_ADMIN_URL}/users`, {
+      headers: getHeaders()
+    });
     if (!response.ok) throw new Error('Error al cargar usuarios');
     return await response.json();
   } catch (error) {
-    console.error("Error getUsers:", error);
     return [];
   }
 };
@@ -26,7 +33,7 @@ export const resetUserPassword = async (email) => {
   try {
     const response = await fetch(`${API_ADMIN_URL}/send-reset-email`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ email })
     });
 
@@ -35,7 +42,6 @@ export const resetUserPassword = async (email) => {
     
     return { success: true };
   } catch (error) {
-    console.error("Error resetUserPassword:", error);
     return { success: false, error: error.message };
   }
 };
@@ -44,7 +50,7 @@ export const updatePasswordFinal = async (email, newPassword) => {
   try {
     const response = await fetch(`${API_ADMIN_URL}/update-password`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: getHeaders(),
       body: JSON.stringify({ email, newPassword })
     });
 
@@ -53,7 +59,6 @@ export const updatePasswordFinal = async (email, newPassword) => {
 
     return { success: true };
   } catch (error) {
-    console.error("Error updatePasswordFinal:", error);
     return { success: false, error: error.message };
   }
 };
@@ -61,15 +66,17 @@ export const updatePasswordFinal = async (email, newPassword) => {
 export const deleteUser = async (userId) => {
   try {
     const response = await fetch(`${API_ADMIN_URL}/users/${userId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: getHeaders()
     });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Error al eliminar usuario');
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Error al eliminar usuario');
+    }
 
     return { success: true };
   } catch (error) {
-    console.error("Error deleteUser:", error);
     return { success: false, error: error.message };
   }
 };
@@ -78,7 +85,7 @@ export const requestAccountDeletion = async (userId) => {
   try {
     const response = await fetch(`${API_ADMIN_URL}/users/request-deletion/${userId}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' }
+      headers: getHeaders()
     });
 
     const data = await response.json();
@@ -86,7 +93,22 @@ export const requestAccountDeletion = async (userId) => {
 
     return { success: true };
   } catch (error) {
-    console.error("Error requestAccountDeletion:", error);
     return { success: false, error: error.message };
+  }
+};
+
+export const verifyAdminStatus = async (email) => {
+  try {
+    const response = await fetch(`${API_ADMIN_URL}/verify-admin`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify({ email: email.toLowerCase() })
+    });
+
+    if (!response.ok) return false;
+    const data = await response.json();
+    return data.isAdmin;
+  } catch (error) {
+    return false;
   }
 };

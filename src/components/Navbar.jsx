@@ -23,6 +23,20 @@ const Navbar = () => {
             } else {
                 setIsUserAdmin(false);
             }
+        } else {
+            setIsUserAdmin(false);
+        }
+    };
+
+    useEffect(() => {
+        checkStatus();
+
+        window.addEventListener('storage', checkStatus);
+        const interval = setInterval(checkStatus, 1000);
+
+        return () => {
+            window.removeEventListener('storage', checkStatus);
+            clearInterval(interval);
         };
         verifyAdmin();
     }, [token]);
