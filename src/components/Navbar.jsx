@@ -7,26 +7,47 @@ import logo1 from '../assets/logo1.png';
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const token = localStorage.getItem('token');
     const [isOpen, setIsOpen] = useState(false);
     const [isUserAdmin, setIsUserAdmin] = useState(false);
+    const [token, setToken] = useState(localStorage.getItem('token'));
 
     useEffect(() => {
-        const checkAdminStatus = async () => {
+        const verifyAdmin = async () => {
             if (token) {
-                const adminStatus = await isAdmin();
-                setIsUserAdmin(adminStatus);
+                try {
+                    const adminStatus = await isAdmin();
+                    setIsUserAdmin(adminStatus);
+                } catch (error) {
+                    setIsUserAdmin(false);
+                }
+            } else {
+                setIsUserAdmin(false);
             }
         };
-        checkAdminStatus();
+        verifyAdmin();
+    }, [token]);
+
+    useEffect(() => {
+        const checkTokenChange = () => {
+            const currentToken = localStorage.getItem('token');
+            if (currentToken !== token) {
+                setToken(currentToken);
+            }
+        };
+
+        window.addEventListener('storage', checkTokenChange);
+        const interval = setInterval(checkTokenChange, 1000);
+
+        return () => {
+            window.removeEventListener('storage', checkTokenChange);
+            clearInterval(interval);
+        };
     }, [token]);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user_id');
-        localStorage.removeItem('user_name');
-        localStorage.removeItem('user_email');
+        localStorage.clear();
         setIsUserAdmin(false);
+        setToken(null);
         navigate('/login');
         setIsOpen(false);
     };
@@ -47,17 +68,13 @@ const Navbar = () => {
                         
                         {token && (
                             <>
-                                {/* Solo visible para Pacientes */}
-                                {!isUserAdmin && (
+                                {!isUserAdmin ? (
                                     <>
                                         <Link to="/dashboard" className="nav-item" onClick={() => setIsOpen(false)}>Mi Panel</Link>
                                         <Link to="/historial" className="nav-item" onClick={() => setIsOpen(false)}>Historial</Link>
                                         <Link to="/perfil" className="nav-item" onClick={() => setIsOpen(false)}>Mi Perfil</Link>
                                     </>
-                                )}
-                                
-                                {/* Solo visible para Administradores */}
-                                {isUserAdmin && (
+                                ) : (
                                     <Link to="/admin" className="nav-item" onClick={() => setIsOpen(false)}>Panel Admin</Link>
                                 )}
                             </>
